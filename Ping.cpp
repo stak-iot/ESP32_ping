@@ -136,12 +136,12 @@ static err_t ping_send(int s, ip4_addr_t *addr, int size) {
 
 	to.sin_len = sizeof(to);
 	to.sin_family = AF_INET;
-	inet_addr_from_ipaddr(&to.sin_addr, addr);
+	inet_addr_from_ip4addr(&to.sin_addr, addr);
 
 	if ((err = sendto(s, iecho, ping_size, 0, (struct sockaddr*)&to, sizeof(to)))) {
 		transmitted++;
 	}
-	free(iecho)
+	free(iecho);
 	return (err ? ERR_OK : ERR_VAL);
 }
 
@@ -169,7 +169,7 @@ static void ping_recv(int s) {
 
 			/// Get from IP address
 			ip4_addr_t fromaddr;
-			inet_addr_to_ipaddr(&fromaddr, &from.sin_addr);
+			inet_addr_to_ip4addr(&fromaddr, &from.sin_addr);
 
 			strcpy(ipa, inet_ntoa(fromaddr));
 
@@ -209,7 +209,7 @@ static void ping_recv(int s) {
 
 				// Print ...
 				log_d("%d bytes from %s: icmp_seq=%d time=%.3f ms\r\n", len, ipa,
-					ntohs(iecho->seqno), elapsed
+					  ntohs(iecho->seqno), elapsed
 				);
 
 				return;
@@ -246,7 +246,7 @@ void ping(const char *name, int count, int interval, int size, int timeout) {
 	ping_start(adr, count, interval, size, timeout);
 }
 bool ping_start(struct ping_option *ping_o) {
-	
+
 
 	return ping_start(ping_o->ip,ping_o->count,0,0,0);
 
@@ -280,8 +280,8 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
 	}
 
 
-	address.sin_addr.s_addr = adr; 
-	ping_target.addr = address.sin_addr.s_addr; 
+	address.sin_addr.s_addr = adr;
+	ping_target.addr = address.sin_addr.s_addr;
 
 	// Setup socket
 	struct timeval tout;
@@ -325,9 +325,9 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
 	closesocket(s);
 
 	log_i("%d packets transmitted, %d packets received, %.1f%% packet loss\r\n",
-		transmitted,
-		received,
-		((((float)transmitted - (float)received) / (float)transmitted) * 100.0)
+		  transmitted,
+		  received,
+		  ((((float)transmitted - (float)received) / (float)transmitted) * 100.0)
 	);
 
 	if (received) {
@@ -339,7 +339,7 @@ bool ping_start(IPAddress adr, int count=0, int interval=0, int size=0, int time
 		pingresp.total_time = mean_time;
 		pingresp.ping_err = 0;
 		return true;
-	//	ping_o->sent_function(ping_o, (uint8*)&pingresp);
+		//	ping_o->sent_function(ping_o, (uint8*)&pingresp);
 	}
 	return false;
 }
